@@ -1,0 +1,2614 @@
+openapi: 3.0.0
+info:
+  description: "UploadThing is the easiest way to add file uploads to your full stack\
+    \ TypeScript application. Many services have tried to build a \"better S3\", but\
+    \ in our opinion, none found the right compromise of ownership, flexibility and\
+    \ safety."
+  title: UploadThing REST API
+  version: 6.4.0
+  x-konfig-has-globally-required-security: true
+servers:
+- description: Production
+  url: https://uploadthing.com/api
+security:
+- ApiKeyAuth: []
+tags:
+- name: File
+- name: ServerCallback
+- name: UsageInfo
+- name: Multipart
+- name: Callback
+- name: Upload
+paths:
+  /serverCallback:
+    get:
+      description: Poll for server callback data. This is used to retrieve the data
+        returned from `onUploadComplete` callback.
+      operationId: ServerCallback_getData
+      parameters:
+      - explode: false
+        in: header
+        name: authorization
+        required: true
+        schema:
+          description: The JWT token you got along with the presigned URLs from `/prepareUpload`
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerCallbackGetDataResponse'
+          description: Poll successful
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrBadRequest'
+          description: Your request input was invalid. Please check your request and
+            try again.
+          x-do-not-generate: true
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrUnauthorized'
+          description: "Your request was not authorized, either due to missing or\
+            \ invalid API key provided."
+          x-do-not-generate: true
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrInternalServerError'
+          description: An unexpected error occurred. Please try again later.
+          x-do-not-generate: true
+      tags:
+      - ServerCallback
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--serverCallback
+      x-accepts: application/json
+    post:
+      description: Set server callback data. This is used to set the data returned
+        from `onUploadComplete` callback.
+      operationId: ServerCallback_setData
+      parameters:
+      - explode: false
+        in: header
+        name: x-uploadthing-version
+        required: true
+        schema:
+          description: A semver parseable version string of the SDK calling the API
+          example: 6.4.0
+          type: string
+          x-konfig-original-example: 6.4.0
+          x-konfig-generated-schema: konfig-generated-schema-paths--serverCallback-post-parameters-0-schema
+        style: simple
+      - explode: false
+        in: header
+        name: x-uploadthing-fe-package
+        required: false
+        schema:
+          description: "Used for analytics, the package name of the frontend"
+          example: '@uploadthing/react'
+          type: string
+          x-konfig-original-example: '@uploadthing/react'
+          x-konfig-generated-schema: konfig-generated-schema-paths--serverCallback-post-parameters-1-schema
+        style: simple
+      - explode: false
+        in: header
+        name: x-uploadthing-be-adapter
+        required: false
+        schema:
+          description: "Used for analytics, the name of the backend adapter"
+          example: express
+          type: string
+          x-konfig-original-example: express
+          x-konfig-generated-schema: konfig-generated-schema-paths--serverCallback-post-parameters-2-schema
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServerCallbackSetDataRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerCallbackSetDataResponse'
+          description: Successfully set callback data.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrBadRequest'
+          description: Your request input was invalid. Please check your request and
+            try again.
+          x-do-not-generate: true
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrUnauthorized'
+          description: "Your request was not authorized, either due to missing or\
+            \ invalid API key provided."
+          x-do-not-generate: true
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrInternalServerError'
+          description: An unexpected error occurred. Please try again later.
+          x-do-not-generate: true
+      tags:
+      - ServerCallback
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-post--serverCallback
+      x-content-type: application/json
+      x-accepts: application/json
+  /listFiles:
+    post:
+      description: List files for the current app. Response is paginated.
+      operationId: File_listFiles
+      parameters:
+      - explode: false
+        in: header
+        name: x-uploadthing-version
+        required: true
+        schema:
+          description: A semver parseable version string of the SDK calling the API
+          example: 6.4.0
+          type: string
+          x-konfig-original-example: 6.4.0
+          x-konfig-generated-schema: konfig-generated-schema-paths--listFiles-post-parameters-0-schema
+        style: simple
+      - explode: false
+        in: header
+        name: x-uploadthing-fe-package
+        required: false
+        schema:
+          description: "Used for analytics, the package name of the frontend"
+          example: '@uploadthing/react'
+          type: string
+          x-konfig-original-example: '@uploadthing/react'
+          x-konfig-generated-schema: konfig-generated-schema-paths--listFiles-post-parameters-1-schema
+        style: simple
+      - explode: false
+        in: header
+        name: x-uploadthing-be-adapter
+        required: false
+        schema:
+          description: "Used for analytics, the name of the backend adapter"
+          example: express
+          type: string
+          x-konfig-original-example: express
+          x-konfig-generated-schema: konfig-generated-schema-paths--listFiles-post-parameters-2-schema
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FileListFilesRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileListFilesResponse'
+          description: Successfully retrieved files.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrBadRequest'
+          description: Your request input was invalid. Please check your request and
+            try again.
+          x-do-not-generate: true
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrUnauthorized'
+          description: "Your request was not authorized, either due to missing or\
+            \ invalid API key provided."
+          x-do-not-generate: true
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrInternalServerError'
+          description: An unexpected error occurred. Please try again later.
+          x-do-not-generate: true
+      tags:
+      - File
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-post--listFiles
+      x-content-type: application/json
+      x-accepts: application/json
+  /renameFiles:
+    post:
+      description: Rename files.
+      operationId: File_renameFiles
+      parameters:
+      - explode: false
+        in: header
+        name: x-uploadthing-version
+        required: true
+        schema:
+          description: A semver parseable version string of the SDK calling the API
+          example: 6.4.0
+          type: string
+          x-konfig-original-example: 6.4.0
+          x-konfig-generated-schema: konfig-generated-schema-paths--renameFiles-post-parameters-0-schema
+        style: simple
+      - explode: false
+        in: header
+        name: x-uploadthing-fe-package
+        required: false
+        schema:
+          description: "Used for analytics, the package name of the frontend"
+          example: '@uploadthing/react'
+          type: string
+          x-konfig-original-example: '@uploadthing/react'
+          x-konfig-generated-schema: konfig-generated-schema-paths--renameFiles-post-parameters-1-schema
+        style: simple
+      - explode: false
+        in: header
+        name: x-uploadthing-be-adapter
+        required: false
+        schema:
+          description: "Used for analytics, the name of the backend adapter"
+          example: express
+          type: string
+          x-konfig-original-example: express
+          x-konfig-generated-schema: konfig-generated-schema-paths--renameFiles-post-parameters-2-schema
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FileRenameFilesRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileRenameFilesResponse'
+          description: Successfully renamed files.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrBadRequest'
+          description: Your request input was invalid. Please check your request and
+            try again.
+          x-do-not-generate: true
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrUnauthorized'
+          description: "Your request was not authorized, either due to missing or\
+            \ invalid API key provided."
+          x-do-not-generate: true
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrInternalServerError'
+          description: An unexpected error occurred. Please try again later.
+          x-do-not-generate: true
+      tags:
+      - File
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-post--renameFiles
+      x-content-type: application/json
+      x-accepts: application/json
+  /renameFile:
+    post:
+      deprecated: true
+      description: Use /renameFiles instead.
+      operationId: File_updateFileName
+      parameters:
+      - explode: false
+        in: header
+        name: x-uploadthing-version
+        required: true
+        schema:
+          description: A semver parseable version string of the SDK calling the API
+          example: 6.4.0
+          type: string
+          x-konfig-original-example: 6.4.0
+          x-konfig-generated-schema: konfig-generated-schema-paths--renameFile-post-parameters-0-schema
+        style: simple
+      - explode: false
+        in: header
+        name: x-uploadthing-fe-package
+        required: false
+        schema:
+          description: "Used for analytics, the package name of the frontend"
+          example: '@uploadthing/react'
+          type: string
+          x-konfig-original-example: '@uploadthing/react'
+          x-konfig-generated-schema: konfig-generated-schema-paths--renameFile-post-parameters-1-schema
+        style: simple
+      - explode: false
+        in: header
+        name: x-uploadthing-be-adapter
+        required: false
+        schema:
+          description: "Used for analytics, the name of the backend adapter"
+          example: express
+          type: string
+          x-konfig-original-example: express
+          x-konfig-generated-schema: konfig-generated-schema-paths--renameFile-post-parameters-2-schema
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FileUpdateFileNameRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileUpdateFileNameResponse'
+          description: Successfully renamed files.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrBadRequest'
+          description: Your request input was invalid. Please check your request and
+            try again.
+          x-do-not-generate: true
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrUnauthorized'
+          description: "Your request was not authorized, either due to missing or\
+            \ invalid API key provided."
+          x-do-not-generate: true
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrInternalServerError'
+          description: An unexpected error occurred. Please try again later.
+          x-do-not-generate: true
+      tags:
+      - File
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-post--renameFile
+      x-content-type: application/json
+      x-accepts: application/json
+  /deleteFile:
+    post:
+      description: Mark files for deletion. The files will be deleted at the storage
+        provider shortly after.
+      operationId: File_markForDeletion
+      parameters:
+      - explode: false
+        in: header
+        name: x-uploadthing-version
+        required: true
+        schema:
+          description: A semver parseable version string of the SDK calling the API
+          example: 6.4.0
+          type: string
+          x-konfig-original-example: 6.4.0
+          x-konfig-generated-schema: konfig-generated-schema-paths--deleteFile-post-parameters-0-schema
+        style: simple
+      - explode: false
+        in: header
+        name: x-uploadthing-fe-package
+        required: false
+        schema:
+          description: "Used for analytics, the package name of the frontend"
+          example: '@uploadthing/react'
+          type: string
+          x-konfig-original-example: '@uploadthing/react'
+          x-konfig-generated-schema: konfig-generated-schema-paths--deleteFile-post-parameters-1-schema
+        style: simple
+      - explode: false
+        in: header
+        name: x-uploadthing-be-adapter
+        required: false
+        schema:
+          description: "Used for analytics, the name of the backend adapter"
+          example: express
+          type: string
+          x-konfig-original-example: express
+          x-konfig-generated-schema: konfig-generated-schema-paths--deleteFile-post-parameters-2-schema
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FileMarkForDeletionRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileMarkForDeletionResponse'
+          description: Successfully marked file for deletion.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrBadRequest'
+          description: Your request input was invalid. Please check your request and
+            try again.
+          x-do-not-generate: true
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrUnauthorized'
+          description: "Your request was not authorized, either due to missing or\
+            \ invalid API key provided."
+          x-do-not-generate: true
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrInternalServerError'
+          description: An unexpected error occurred. Please try again later.
+          x-do-not-generate: true
+      tags:
+      - File
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-post--deleteFile
+      x-content-type: application/json
+      x-accepts: application/json
+  /getFileUrl:
+    post:
+      deprecated: true
+      description: "Get a list of URLs for given file keys. This API is deprecated,\
+        \ use `https://utfs.io/f/FILE_KEY`."
+      operationId: File_getFileUrls
+      parameters:
+      - explode: false
+        in: header
+        name: x-uploadthing-version
+        required: true
+        schema:
+          description: A semver parseable version string of the SDK calling the API
+          example: 6.4.0
+          type: string
+          x-konfig-original-example: 6.4.0
+          x-konfig-generated-schema: konfig-generated-schema-paths--getFileUrl-post-parameters-0-schema
+        style: simple
+      - explode: false
+        in: header
+        name: x-uploadthing-fe-package
+        required: false
+        schema:
+          description: "Used for analytics, the package name of the frontend"
+          example: '@uploadthing/react'
+          type: string
+          x-konfig-original-example: '@uploadthing/react'
+          x-konfig-generated-schema: konfig-generated-schema-paths--getFileUrl-post-parameters-1-schema
+        style: simple
+      - explode: false
+        in: header
+        name: x-uploadthing-be-adapter
+        required: false
+        schema:
+          description: "Used for analytics, the name of the backend adapter"
+          example: express
+          type: string
+          x-konfig-original-example: express
+          x-konfig-generated-schema: konfig-generated-schema-paths--getFileUrl-post-parameters-2-schema
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FileGetFileUrlsRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileGetFileUrlsResponse'
+          description: Successfully retrieved file URLs.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrBadRequest'
+          description: Your request input was invalid. Please check your request and
+            try again.
+          x-do-not-generate: true
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrUnauthorized'
+          description: "Your request was not authorized, either due to missing or\
+            \ invalid API key provided."
+          x-do-not-generate: true
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrInternalServerError'
+          description: An unexpected error occurred. Please try again later.
+          x-do-not-generate: true
+      tags:
+      - File
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-post--getFileUrl
+      x-content-type: application/json
+      x-accepts: application/json
+  /getUsageInfo:
+    post:
+      description: Retrieve usage info for the app associated with the provided API
+        key.
+      operationId: UsageInfo_getUsageInfo
+      parameters:
+      - explode: false
+        in: header
+        name: x-uploadthing-version
+        required: true
+        schema:
+          description: A semver parseable version string of the SDK calling the API
+          example: 6.4.0
+          type: string
+          x-konfig-original-example: 6.4.0
+          x-konfig-generated-schema: konfig-generated-schema-paths--getUsageInfo-post-parameters-0-schema
+        style: simple
+      - explode: false
+        in: header
+        name: x-uploadthing-fe-package
+        required: false
+        schema:
+          description: "Used for analytics, the package name of the frontend"
+          example: '@uploadthing/react'
+          type: string
+          x-konfig-original-example: '@uploadthing/react'
+          x-konfig-generated-schema: konfig-generated-schema-paths--getUsageInfo-post-parameters-1-schema
+        style: simple
+      - explode: false
+        in: header
+        name: x-uploadthing-be-adapter
+        required: false
+        schema:
+          description: "Used for analytics, the name of the backend adapter"
+          example: express
+          type: string
+          x-konfig-original-example: express
+          x-konfig-generated-schema: konfig-generated-schema-paths--getUsageInfo-post-parameters-2-schema
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsageInfoGetUsageInfoResponse'
+          description: Successfully retrieved usage info.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrBadRequest'
+          description: Your request input was invalid. Please check your request and
+            try again.
+          x-do-not-generate: true
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrUnauthorized'
+          description: "Your request was not authorized, either due to missing or\
+            \ invalid API key provided."
+          x-do-not-generate: true
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrInternalServerError'
+          description: An unexpected error occurred. Please try again later.
+          x-do-not-generate: true
+      tags:
+      - UsageInfo
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-post--getUsageInfo
+      x-accepts: application/json
+  /completeMultipart:
+    post:
+      description: Complete a multipart upload. This will finalize the upload and
+        make the file available for download.
+      operationId: Multipart_completeUpload
+      parameters:
+      - explode: false
+        in: header
+        name: x-uploadthing-version
+        required: true
+        schema:
+          description: A semver parseable version string of the SDK calling the API
+          example: 6.4.0
+          type: string
+          x-konfig-original-example: 6.4.0
+          x-konfig-generated-schema: konfig-generated-schema-paths--completeMultipart-post-parameters-0-schema
+        style: simple
+      - explode: false
+        in: header
+        name: x-uploadthing-fe-package
+        required: false
+        schema:
+          description: "Used for analytics, the package name of the frontend"
+          example: '@uploadthing/react'
+          type: string
+          x-konfig-original-example: '@uploadthing/react'
+          x-konfig-generated-schema: konfig-generated-schema-paths--completeMultipart-post-parameters-1-schema
+        style: simple
+      - explode: false
+        in: header
+        name: x-uploadthing-be-adapter
+        required: false
+        schema:
+          description: "Used for analytics, the name of the backend adapter"
+          example: express
+          type: string
+          x-konfig-original-example: express
+          x-konfig-generated-schema: konfig-generated-schema-paths--completeMultipart-post-parameters-2-schema
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MultipartCompleteUploadRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MultipartCompleteUploadResponse'
+          description: Successfully completed the multipart upload.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrBadRequest'
+          description: Your request input was invalid. Please check your request and
+            try again.
+          x-do-not-generate: true
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrUnauthorized'
+          description: "Your request was not authorized, either due to missing or\
+            \ invalid API key provided."
+          x-do-not-generate: true
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrInternalServerError'
+          description: An unexpected error occurred. Please try again later.
+          x-do-not-generate: true
+      tags:
+      - Multipart
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-post--completeMultipart
+      x-content-type: application/json
+      x-accepts: application/json
+  /failureCallback:
+    post:
+      description: "Mark an upload as failed, or abort a multipart upload. This will\
+        \ free up resources and revert the storage quota."
+      operationId: Callback_markUploadFailed
+      parameters:
+      - explode: false
+        in: header
+        name: x-uploadthing-version
+        required: true
+        schema:
+          description: A semver parseable version string of the SDK calling the API
+          example: 6.4.0
+          type: string
+          x-konfig-original-example: 6.4.0
+          x-konfig-generated-schema: konfig-generated-schema-paths--failureCallback-post-parameters-0-schema
+        style: simple
+      - explode: false
+        in: header
+        name: x-uploadthing-fe-package
+        required: false
+        schema:
+          description: "Used for analytics, the package name of the frontend"
+          example: '@uploadthing/react'
+          type: string
+          x-konfig-original-example: '@uploadthing/react'
+          x-konfig-generated-schema: konfig-generated-schema-paths--failureCallback-post-parameters-1-schema
+        style: simple
+      - explode: false
+        in: header
+        name: x-uploadthing-be-adapter
+        required: false
+        schema:
+          description: "Used for analytics, the name of the backend adapter"
+          example: express
+          type: string
+          x-konfig-original-example: express
+          x-konfig-generated-schema: konfig-generated-schema-paths--failureCallback-post-parameters-2-schema
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CallbackMarkUploadFailedRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CallbackMarkUploadFailedResponse'
+          description: Successfully aborted or marked upload as failed.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrBadRequest'
+          description: Your request input was invalid. Please check your request and
+            try again.
+          x-do-not-generate: true
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrUnauthorized'
+          description: "Your request was not authorized, either due to missing or\
+            \ invalid API key provided."
+          x-do-not-generate: true
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrInternalServerError'
+          description: An unexpected error occurred. Please try again later.
+          x-do-not-generate: true
+      tags:
+      - Callback
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-post--failureCallback
+      x-content-type: application/json
+      x-accepts: application/json
+  /requestFileAccess:
+    post:
+      description: Request a presigned GET url for a private file.
+      operationId: File_requestPresignedUrl
+      parameters:
+      - explode: false
+        in: header
+        name: x-uploadthing-version
+        required: true
+        schema:
+          description: A semver parseable version string of the SDK calling the API
+          example: 6.4.0
+          type: string
+          x-konfig-original-example: 6.4.0
+          x-konfig-generated-schema: konfig-generated-schema-paths--requestFileAccess-post-parameters-0-schema
+        style: simple
+      - explode: false
+        in: header
+        name: x-uploadthing-fe-package
+        required: false
+        schema:
+          description: "Used for analytics, the package name of the frontend"
+          example: '@uploadthing/react'
+          type: string
+          x-konfig-original-example: '@uploadthing/react'
+          x-konfig-generated-schema: konfig-generated-schema-paths--requestFileAccess-post-parameters-1-schema
+        style: simple
+      - explode: false
+        in: header
+        name: x-uploadthing-be-adapter
+        required: false
+        schema:
+          description: "Used for analytics, the name of the backend adapter"
+          example: express
+          type: string
+          x-konfig-original-example: express
+          x-konfig-generated-schema: konfig-generated-schema-paths--requestFileAccess-post-parameters-2-schema
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FileRequestPresignedUrlRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileRequestPresignedUrlResponse'
+          description: Successfully retrieved a presigned GET URL.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrBadRequest'
+          description: Your request input was invalid. Please check your request and
+            try again.
+          x-do-not-generate: true
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrUnauthorized'
+          description: "Your request was not authorized, either due to missing or\
+            \ invalid API key provided."
+          x-do-not-generate: true
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileRequestPresignedUrl404Response'
+          description: File not found.
+          x-do-not-generate: true
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrInternalServerError'
+          description: An unexpected error occurred. Please try again later.
+          x-do-not-generate: true
+      tags:
+      - File
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-post--requestFileAccess
+      x-content-type: application/json
+      x-accepts: application/json
+  /prepareUpload:
+    post:
+      description: "Request presigned URLs for file uploads through based on your\
+        \ file router. NOTE: This spec complies with SDK versions ^6.4. Response may\
+        \ vary for older versions."
+      operationId: Upload_requestPresignedUrls
+      parameters:
+      - explode: false
+        in: header
+        name: x-uploadthing-version
+        required: true
+        schema:
+          description: A semver parseable version string of the SDK calling the API
+          example: 6.4.0
+          type: string
+          x-konfig-original-example: 6.4.0
+          x-konfig-generated-schema: konfig-generated-schema-paths--prepareUpload-post-parameters-0-schema
+        style: simple
+      - explode: false
+        in: header
+        name: x-uploadthing-fe-package
+        required: false
+        schema:
+          description: "Used for analytics, the package name of the frontend"
+          example: '@uploadthing/react'
+          type: string
+          x-konfig-original-example: '@uploadthing/react'
+          x-konfig-generated-schema: konfig-generated-schema-paths--prepareUpload-post-parameters-1-schema
+        style: simple
+      - explode: false
+        in: header
+        name: x-uploadthing-be-adapter
+        required: false
+        schema:
+          description: "Used for analytics, the name of the backend adapter"
+          example: express
+          type: string
+          x-konfig-original-example: express
+          x-konfig-generated-schema: konfig-generated-schema-paths--prepareUpload-post-parameters-2-schema
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UploadRequestPresignedUrlsRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadRequestPresignedUrlsResponse'
+          description: Successfully retrieved presigned URLs.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrBadRequest'
+          description: Your request input was invalid. Please check your request and
+            try again.
+          x-do-not-generate: true
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrUnauthorized'
+          description: "Your request was not authorized, either due to missing or\
+            \ invalid API key provided."
+          x-do-not-generate: true
+        "403":
+          content:
+            application/json:
+              example:
+                error: Storage quota exceeded
+              schema:
+                $ref: '#/components/schemas/ErrForbidden'
+              x-konfig-original-example:
+                error: Storage quota exceeded
+          description: "Your request was valid, but you are not allowed to perform\
+            \ this action."
+          x-do-not-generate: true
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrInternalServerError'
+          description: An unexpected error occurred. Please try again later.
+          x-do-not-generate: true
+      tags:
+      - Upload
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-post--prepareUpload
+      x-content-type: application/json
+      x-accepts: application/json
+  /uploadFiles:
+    post:
+      description: "Request presigned URLs for file uploads without file routes. NOTE:\
+        \ This spec complies with SDK versions ^6.4. Response may vary for older versions."
+      operationId: File_requestPresignedUrls
+      parameters:
+      - explode: false
+        in: header
+        name: x-uploadthing-version
+        required: true
+        schema:
+          description: A semver parseable version string of the SDK calling the API
+          example: 6.4.0
+          type: string
+          x-konfig-original-example: 6.4.0
+          x-konfig-generated-schema: konfig-generated-schema-paths--uploadFiles-post-parameters-0-schema
+        style: simple
+      - explode: false
+        in: header
+        name: x-uploadthing-fe-package
+        required: false
+        schema:
+          description: "Used for analytics, the package name of the frontend"
+          example: '@uploadthing/react'
+          type: string
+          x-konfig-original-example: '@uploadthing/react'
+          x-konfig-generated-schema: konfig-generated-schema-paths--uploadFiles-post-parameters-1-schema
+        style: simple
+      - explode: false
+        in: header
+        name: x-uploadthing-be-adapter
+        required: false
+        schema:
+          description: "Used for analytics, the name of the backend adapter"
+          example: express
+          type: string
+          x-konfig-original-example: express
+          x-konfig-generated-schema: konfig-generated-schema-paths--uploadFiles-post-parameters-2-schema
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FileRequestPresignedUrlsRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileRequestPresignedUrlsResponse'
+          description: Successfully retrieved presigned URLs.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrBadRequest'
+          description: Your request input was invalid. Please check your request and
+            try again.
+          x-do-not-generate: true
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrUnauthorized'
+          description: "Your request was not authorized, either due to missing or\
+            \ invalid API key provided."
+          x-do-not-generate: true
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrInternalServerError'
+          description: An unexpected error occurred. Please try again later.
+          x-do-not-generate: true
+      tags:
+      - File
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-post--uploadFiles
+      x-content-type: application/json
+      x-accepts: application/json
+components:
+  parameters: {}
+  schemas:
+    ErrBadRequest:
+      properties:
+        error:
+          description: A stringified version of the error
+          example: Invalid request input
+          type: string
+          x-konfig-original-example: Invalid request input
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-ErrBadRequest-properties-error
+        data:
+          description: Additional data related to the error
+          example:
+          - code: invalid_type
+            expected: string
+            received: undefined
+            path:
+            - x-uploadthing-api-key
+            message: You must provide an API key in the 'x-uploadthing-api-key' header
+          nullable: true
+          x-konfig-original-example:
+          - code: invalid_type
+            expected: string
+            received: undefined
+            path:
+            - x-uploadthing-api-key
+            message: You must provide an API key in the 'x-uploadthing-api-key' header
+      required:
+      - error
+      type: object
+      x-konfig-is-used-in-non-successful-response: true
+      x-do-not-generate: true
+    ErrUnauthorized:
+      properties:
+        error:
+          description: A stringified version of the error
+          example: Invalid request input
+          type: string
+          x-konfig-original-example: Invalid request input
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-ErrUnauthorized-properties-error
+        data:
+          description: Additional data related to the error
+          example:
+          - code: invalid_type
+            expected: string
+            received: undefined
+            path:
+            - x-uploadthing-api-key
+            message: You must provide an API key in the 'x-uploadthing-api-key' header
+          nullable: true
+          x-konfig-original-example:
+          - code: invalid_type
+            expected: string
+            received: undefined
+            path:
+            - x-uploadthing-api-key
+            message: You must provide an API key in the 'x-uploadthing-api-key' header
+      required:
+      - error
+      type: object
+      x-konfig-is-used-in-non-successful-response: true
+      x-do-not-generate: true
+    ErrInternalServerError:
+      properties:
+        error:
+          description: A stringified version of the error
+          example: Invalid request input
+          type: string
+          x-konfig-original-example: Invalid request input
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-ErrInternalServerError-properties-error
+        data:
+          description: Additional data related to the error
+          example:
+          - code: invalid_type
+            expected: string
+            received: undefined
+            path:
+            - x-uploadthing-api-key
+            message: You must provide an API key in the 'x-uploadthing-api-key' header
+          nullable: true
+          x-konfig-original-example:
+          - code: invalid_type
+            expected: string
+            received: undefined
+            path:
+            - x-uploadthing-api-key
+            message: You must provide an API key in the 'x-uploadthing-api-key' header
+      required:
+      - error
+      type: object
+      x-konfig-is-used-in-non-successful-response: true
+      x-do-not-generate: true
+    PresignedPostURLs:
+      properties:
+        key:
+          type: string
+        fileName:
+          type: string
+        fileType:
+          type: string
+        fileUrl:
+          type: string
+        ContentDisposition:
+          enum:
+          - inline
+          - attachment
+          type: string
+        pollingJwt:
+          type: string
+        pollingUrl:
+          type: string
+        customId:
+          nullable: true
+          type: string
+        url:
+          type: string
+        fields:
+          additionalProperties:
+            type: string
+          type: object
+        urls:
+          items:
+            type: string
+          type: array
+        uploadId:
+          type: string
+        chunkSize:
+          type: number
+        chunkCount:
+          type: number
+      required:
+      - ContentDisposition
+      - customId
+      - fileName
+      - fileType
+      - fileUrl
+      - key
+      - pollingJwt
+      - pollingUrl
+      type: object
+    MultipartUploadURLs:
+      properties:
+        key:
+          type: string
+        fileName:
+          type: string
+        fileType:
+          type: string
+        fileUrl:
+          type: string
+        ContentDisposition:
+          enum:
+          - inline
+          - attachment
+          type: string
+        pollingJwt:
+          type: string
+        pollingUrl:
+          type: string
+        customId:
+          nullable: true
+          type: string
+        urls:
+          items:
+            type: string
+          type: array
+        uploadId:
+          type: string
+        chunkSize:
+          type: number
+        chunkCount:
+          type: number
+      required:
+      - ContentDisposition
+      - chunkCount
+      - chunkSize
+      - customId
+      - fileName
+      - fileType
+      - fileUrl
+      - key
+      - pollingJwt
+      - pollingUrl
+      - uploadId
+      - urls
+      type: object
+    ErrForbidden:
+      properties:
+        error:
+          description: A stringified version of the error
+          example: Invalid request input
+          type: string
+          x-konfig-original-example: Invalid request input
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-ErrForbidden-properties-error
+        data:
+          description: Additional data related to the error
+          example:
+          - code: invalid_type
+            expected: string
+            received: undefined
+            path:
+            - x-uploadthing-api-key
+            message: You must provide an API key in the 'x-uploadthing-api-key' header
+          nullable: true
+          x-konfig-original-example:
+          - code: invalid_type
+            expected: string
+            received: undefined
+            path:
+            - x-uploadthing-api-key
+            message: You must provide an API key in the 'x-uploadthing-api-key' header
+      required:
+      - error
+      type: object
+      x-konfig-is-used-in-non-successful-response: true
+      x-do-not-generate: true
+    RouteConfig: {}
+    ServerCallbackSetDataRequest:
+      example:
+        callbackData: ""
+        fileKey: fileKey
+      properties:
+        fileKey:
+          type: string
+        callbackData:
+          nullable: true
+      required:
+      - fileKey
+      type: object
+    FileListFilesRequest:
+      example: {}
+      properties:
+        limit:
+          default: 500
+          description: The maximum number of files to retrieve.
+          example: 500
+          maximum: 100000
+          minimum: 0
+          type: number
+          x-konfig-original-example: 500
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-FileListFilesRequest-properties-limit
+        offset:
+          default: 0
+          description: The number of files to skip.
+          example: 0
+          minimum: 0
+          type: number
+          x-konfig-original-example: 0
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-FileListFilesRequest-properties-offset
+      required:
+      - limit
+      - offset
+      type: object
+      x-konfig-original-example: {}
+      x-konfig-generated-schema: konfig-generated-schema-components-schemas-FileListFilesRequest
+    FileRenameFilesRequest:
+      example:
+        updates:
+        - newName: newName
+          fileKey: fileKey
+          customId: customId
+        - newName: newName
+          fileKey: fileKey
+          customId: customId
+      properties:
+        updates:
+          items:
+            $ref: '#/components/schemas/FileRenameFilesRequest_updates_inner'
+          type: array
+      required:
+      - updates
+      type: object
+    FileUpdateFileNameRequest:
+      example:
+        updates:
+        - newName: newName
+          fileKey: fileKey
+          customId: customId
+        - newName: newName
+          fileKey: fileKey
+          customId: customId
+      properties:
+        updates:
+          items:
+            $ref: '#/components/schemas/FileRenameFilesRequest_updates_inner'
+          type: array
+      required:
+      - updates
+      type: object
+    FileMarkForDeletionRequest:
+      example:
+        fileKeys:
+        - fileKeys
+        - fileKeys
+        files:
+        - files
+        - files
+        customIds:
+        - customIds
+        - customIds
+      properties:
+        files:
+          items:
+            type: string
+          type: array
+        fileKeys:
+          items:
+            type: string
+          type: array
+        customIds:
+          items:
+            type: string
+          type: array
+      type: object
+    FileGetFileUrlsRequest:
+      example:
+        fileKeys:
+        - fileKeys
+        - fileKeys
+        files:
+        - files
+        - files
+        customIds:
+        - customIds
+        - customIds
+      properties:
+        files:
+          items:
+            type: string
+          type: array
+        fileKeys:
+          items:
+            type: string
+          type: array
+        customIds:
+          items:
+            type: string
+          type: array
+      type: object
+    MultipartCompleteUploadRequest:
+      example:
+        uploadId: uploadId
+        fileKey: fileKey
+        etags:
+        - partNumber: 0.8008281904610115
+          tag: tag
+        - partNumber: 0.8008281904610115
+          tag: tag
+      properties:
+        fileKey:
+          type: string
+        uploadId:
+          type: string
+        etags:
+          items:
+            $ref: '#/components/schemas/MultipartCompleteUploadRequest_etags_inner'
+          type: array
+      required:
+      - etags
+      - fileKey
+      - uploadId
+      type: object
+    CallbackMarkUploadFailedRequest:
+      example:
+        uploadId: uploadId
+        fileKey: fileKey
+      properties:
+        fileKey:
+          type: string
+        uploadId:
+          description: "The uploadId, only applicable for multipart uploads."
+          nullable: true
+          type: string
+      required:
+      - fileKey
+      type: object
+    FileRequestPresignedUrlRequest:
+      example:
+        expiresIn: 48434.08895908198
+        fileKey: fileKey
+        customId: customId
+      properties:
+        fileKey:
+          type: string
+        customId:
+          type: string
+        expiresIn:
+          exclusiveMinimum: true
+          maximum: 604800
+          minimum: 0
+          type: number
+      type: object
+    UploadRequestPresignedUrlsRequest:
+      example:
+        metadata: ""
+        routeConfig: ""
+        files:
+        - size: 0.08008281904610115
+          name: name
+          customId: customId
+        - size: 0.08008281904610115
+          name: name
+          customId: customId
+        callbackUrl: https://openapi-generator.tech
+        callbackSlug: callbackSlug
+      properties:
+        callbackUrl:
+          format: uri
+          type: string
+        callbackSlug:
+          type: string
+        files:
+          items:
+            $ref: '#/components/schemas/UploadRequestPresignedUrlsRequest_files_inner'
+          type: array
+        routeConfig: {}
+        metadata:
+          nullable: true
+      required:
+      - callbackSlug
+      - callbackUrl
+      - files
+      - routeConfig
+      type: object
+    FileRequestPresignedUrlsRequest:
+      example:
+        metadata: ""
+        contentDisposition: inline
+        files:
+        - size: 0.08008281904610115
+          name: name
+          type: type
+          customId: customId
+        - size: 0.08008281904610115
+          name: name
+          type: type
+          customId: customId
+        acl: public-read
+      properties:
+        files:
+          items:
+            $ref: '#/components/schemas/FileRequestPresignedUrlsRequest_files_inner'
+          type: array
+        acl:
+          enum:
+          - public-read
+          - private
+          type: string
+        metadata:
+          nullable: true
+        contentDisposition:
+          default: inline
+          enum:
+          - inline
+          - attachment
+          example: inline
+          type: string
+          x-konfig-original-example: inline
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-FileRequestPresignedUrlsRequest-properties-contentDisposition
+      required:
+      - contentDisposition
+      - files
+      type: object
+    ServerCallbackGetDataResponse:
+      example:
+        callbackData: ""
+        status: still waiting
+      properties:
+        status:
+          enum:
+          - still waiting
+          - done
+          type: string
+        callbackData:
+          description: The callback data set by the server by calling the POST /serverCallback
+            route
+          nullable: true
+      required:
+      - status
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    ServerCallbackSetDataResponse:
+      example:
+        status: status
+      properties:
+        status:
+          type: string
+      required:
+      - status
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    FileListFilesResponse:
+      example:
+        hasMore: true
+        files:
+        - name: name
+          id: id
+          customId: customId
+          key: key
+          status: status
+        - name: name
+          id: id
+          customId: customId
+          key: key
+          status: status
+      properties:
+        hasMore:
+          description: Whether there are more files to retrieve.
+          type: boolean
+        files:
+          items:
+            $ref: '#/components/schemas/FileListFilesResponse_files_inner'
+          type: array
+      required:
+      - files
+      - hasMore
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    FileRenameFilesResponse:
+      example:
+        success: true
+      properties:
+        success:
+          type: boolean
+      required:
+      - success
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    FileUpdateFileNameResponse:
+      example:
+        success: true
+      properties:
+        success:
+          type: boolean
+      required:
+      - success
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    FileMarkForDeletionResponse:
+      example:
+        success: true
+      properties:
+        success:
+          type: boolean
+      required:
+      - success
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    FileGetFileUrlsResponse:
+      example:
+        data:
+        - url: url
+          key: key
+        - url: url
+          key: key
+      properties:
+        data:
+          items:
+            $ref: '#/components/schemas/FileGetFileUrlsResponse_data_inner'
+          type: array
+      required:
+      - data
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    UsageInfoGetUsageInfoResponse:
+      example:
+        filesUploaded: 1.4658129805029452
+        appTotalBytes: 6.027456183070403
+        limitBytes: 5.962133916683182
+        totalBytes: 0.8008281904610115
+      properties:
+        totalBytes:
+          description: "Total bytes used counting towards the quota. For free apps\
+            \ this means the total bytes used by all free apps, for paid apps this\
+            \ will be the same as `appTotalBytes`."
+          type: number
+        appTotalBytes:
+          description: Total bytes used by this app.
+          type: number
+        filesUploaded:
+          description: Total number of files uploaded by this app.
+          type: number
+        limitBytes:
+          description: The allocated storage quota for the app in bytes.
+          type: number
+      required:
+      - appTotalBytes
+      - filesUploaded
+      - limitBytes
+      - totalBytes
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    MultipartCompleteUploadResponse:
+      example:
+        success: true
+      properties:
+        success:
+          type: boolean
+      required:
+      - success
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    CallbackMarkUploadFailedResponse:
+      example:
+        success: true
+      properties:
+        success:
+          type: boolean
+      required:
+      - success
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    FileRequestPresignedUrlResponse:
+      example:
+        url: url
+      properties:
+        url:
+          type: string
+      required:
+      - url
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    FileRequestPresignedUrl404Response:
+      properties:
+        error:
+          type: string
+      required:
+      - error
+      type: object
+      x-konfig-is-used-in-non-successful-response: true
+      x-do-not-generate: true
+    UploadRequestPresignedUrlsResponse:
+      items: {}
+      type: array
+      x-konfig-is-used-in-successful-response: true
+    FileRequestPresignedUrlsResponse:
+      example:
+        data:
+        - ""
+        - ""
+      properties:
+        data:
+          items: {}
+          type: array
+      required:
+      - data
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    konfig-generated-schema-paths--serverCallback-post-parameters-0-schema:
+      example: 6.4.0
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-paths--serverCallback-post-parameters-1-schema:
+      example: '@uploadthing/react'
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-paths--serverCallback-post-parameters-2-schema:
+      example: express
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-paths--listFiles-post-parameters-0-schema:
+      example: 6.4.0
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-paths--listFiles-post-parameters-1-schema:
+      example: '@uploadthing/react'
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-paths--listFiles-post-parameters-2-schema:
+      example: express
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-paths--renameFiles-post-parameters-0-schema:
+      example: 6.4.0
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-paths--renameFiles-post-parameters-1-schema:
+      example: '@uploadthing/react'
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-paths--renameFiles-post-parameters-2-schema:
+      example: express
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-paths--renameFile-post-parameters-0-schema:
+      example: 6.4.0
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-paths--renameFile-post-parameters-1-schema:
+      example: '@uploadthing/react'
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-paths--renameFile-post-parameters-2-schema:
+      example: express
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-paths--deleteFile-post-parameters-0-schema:
+      example: 6.4.0
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-paths--deleteFile-post-parameters-1-schema:
+      example: '@uploadthing/react'
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-paths--deleteFile-post-parameters-2-schema:
+      example: express
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-paths--getFileUrl-post-parameters-0-schema:
+      example: 6.4.0
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-paths--getFileUrl-post-parameters-1-schema:
+      example: '@uploadthing/react'
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-paths--getFileUrl-post-parameters-2-schema:
+      example: express
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-paths--getUsageInfo-post-parameters-0-schema:
+      example: 6.4.0
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-paths--getUsageInfo-post-parameters-1-schema:
+      example: '@uploadthing/react'
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-paths--getUsageInfo-post-parameters-2-schema:
+      example: express
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-paths--completeMultipart-post-parameters-0-schema:
+      example: 6.4.0
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-paths--completeMultipart-post-parameters-1-schema:
+      example: '@uploadthing/react'
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-paths--completeMultipart-post-parameters-2-schema:
+      example: express
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-paths--failureCallback-post-parameters-0-schema:
+      example: 6.4.0
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-paths--failureCallback-post-parameters-1-schema:
+      example: '@uploadthing/react'
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-paths--failureCallback-post-parameters-2-schema:
+      example: express
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-paths--requestFileAccess-post-parameters-0-schema:
+      example: 6.4.0
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-paths--requestFileAccess-post-parameters-1-schema:
+      example: '@uploadthing/react'
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-paths--requestFileAccess-post-parameters-2-schema:
+      example: express
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-paths--prepareUpload-post-parameters-0-schema:
+      example: 6.4.0
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-paths--prepareUpload-post-parameters-1-schema:
+      example: '@uploadthing/react'
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-paths--prepareUpload-post-parameters-2-schema:
+      example: express
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-paths--uploadFiles-post-parameters-0-schema:
+      example: 6.4.0
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-paths--uploadFiles-post-parameters-1-schema:
+      example: '@uploadthing/react'
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-paths--uploadFiles-post-parameters-2-schema:
+      example: express
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-ErrBadRequest-properties-error:
+      example: Invalid request input
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-ErrUnauthorized-properties-error:
+      example: Invalid request input
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-ErrInternalServerError-properties-error:
+      example: Invalid request input
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-ErrForbidden-properties-error:
+      example: Invalid request input
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-RouteConfig-anyOf-1-additionalProperties-properties-maxFileSize:
+      example: 4MB
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-RouteConfig-anyOf-1-additionalProperties-properties-maxFileCount:
+      example: 1
+      type: number
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-RouteConfig-anyOf-1-additionalProperties-properties-contentDisposition:
+      example: inline
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-FileListFilesRequest:
+      example: {}
+      properties: {}
+      type: object
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-FileListFilesRequest-properties-limit:
+      example: 500
+      type: number
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-FileListFilesRequest-properties-offset:
+      example: 0
+      type: number
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-FileRequestPresignedUrlsRequest-properties-contentDisposition:
+      example: inline
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-single-parameter-schema-get--serverCallback:
+      properties:
+        authorization:
+          description: The JWT token you got along with the presigned URLs from `/prepareUpload`
+          type: string
+      required:
+      - authorization
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - authorization
+    konfig-generated-schema-single-parameter-schema-post--serverCallback:
+      properties:
+        x-uploadthing-version:
+          description: A semver parseable version string of the SDK calling the API
+          example: 6.4.0
+          type: string
+          x-konfig-original-example: 6.4.0
+          x-konfig-generated-schema: konfig-generated-schema-paths--serverCallback-post-parameters-0-schema
+        x-uploadthing-fe-package:
+          description: "Used for analytics, the package name of the frontend"
+          example: '@uploadthing/react'
+          type: string
+          x-konfig-original-example: '@uploadthing/react'
+          x-konfig-generated-schema: konfig-generated-schema-paths--serverCallback-post-parameters-1-schema
+        x-uploadthing-be-adapter:
+          description: "Used for analytics, the name of the backend adapter"
+          example: express
+          type: string
+          x-konfig-original-example: express
+          x-konfig-generated-schema: konfig-generated-schema-paths--serverCallback-post-parameters-2-schema
+        fileKey:
+          type: string
+        callbackData:
+          nullable: true
+      required:
+      - fileKey
+      - x-uploadthing-version
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - x-uploadthing-version
+      - x-uploadthing-fe-package
+      - x-uploadthing-be-adapter
+    konfig-generated-schema-single-parameter-schema-post--listFiles:
+      properties:
+        x-uploadthing-version:
+          description: A semver parseable version string of the SDK calling the API
+          example: 6.4.0
+          type: string
+          x-konfig-original-example: 6.4.0
+          x-konfig-generated-schema: konfig-generated-schema-paths--listFiles-post-parameters-0-schema
+        x-uploadthing-fe-package:
+          description: "Used for analytics, the package name of the frontend"
+          example: '@uploadthing/react'
+          type: string
+          x-konfig-original-example: '@uploadthing/react'
+          x-konfig-generated-schema: konfig-generated-schema-paths--listFiles-post-parameters-1-schema
+        x-uploadthing-be-adapter:
+          description: "Used for analytics, the name of the backend adapter"
+          example: express
+          type: string
+          x-konfig-original-example: express
+          x-konfig-generated-schema: konfig-generated-schema-paths--listFiles-post-parameters-2-schema
+        limit:
+          default: 500
+          description: The maximum number of files to retrieve.
+          example: 500
+          maximum: 100000
+          minimum: 0
+          type: number
+          x-konfig-original-example: 500
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-FileListFilesRequest-properties-limit
+        offset:
+          default: 0
+          description: The number of files to skip.
+          example: 0
+          minimum: 0
+          type: number
+          x-konfig-original-example: 0
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-FileListFilesRequest-properties-offset
+      required:
+      - limit
+      - offset
+      - x-uploadthing-version
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - x-uploadthing-version
+      - x-uploadthing-fe-package
+      - x-uploadthing-be-adapter
+    konfig-generated-schema-single-parameter-schema-post--renameFiles:
+      properties:
+        x-uploadthing-version:
+          description: A semver parseable version string of the SDK calling the API
+          example: 6.4.0
+          type: string
+          x-konfig-original-example: 6.4.0
+          x-konfig-generated-schema: konfig-generated-schema-paths--renameFiles-post-parameters-0-schema
+        x-uploadthing-fe-package:
+          description: "Used for analytics, the package name of the frontend"
+          example: '@uploadthing/react'
+          type: string
+          x-konfig-original-example: '@uploadthing/react'
+          x-konfig-generated-schema: konfig-generated-schema-paths--renameFiles-post-parameters-1-schema
+        x-uploadthing-be-adapter:
+          description: "Used for analytics, the name of the backend adapter"
+          example: express
+          type: string
+          x-konfig-original-example: express
+          x-konfig-generated-schema: konfig-generated-schema-paths--renameFiles-post-parameters-2-schema
+        updates:
+          items:
+            properties:
+              fileKey:
+                type: string
+              customId:
+                type: string
+              newName:
+                type: string
+            required:
+            - newName
+            type: object
+          type: array
+      required:
+      - updates
+      - x-uploadthing-version
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - x-uploadthing-version
+      - x-uploadthing-fe-package
+      - x-uploadthing-be-adapter
+    konfig-generated-schema-single-parameter-schema-post--renameFile:
+      properties:
+        x-uploadthing-version:
+          description: A semver parseable version string of the SDK calling the API
+          example: 6.4.0
+          type: string
+          x-konfig-original-example: 6.4.0
+          x-konfig-generated-schema: konfig-generated-schema-paths--renameFile-post-parameters-0-schema
+        x-uploadthing-fe-package:
+          description: "Used for analytics, the package name of the frontend"
+          example: '@uploadthing/react'
+          type: string
+          x-konfig-original-example: '@uploadthing/react'
+          x-konfig-generated-schema: konfig-generated-schema-paths--renameFile-post-parameters-1-schema
+        x-uploadthing-be-adapter:
+          description: "Used for analytics, the name of the backend adapter"
+          example: express
+          type: string
+          x-konfig-original-example: express
+          x-konfig-generated-schema: konfig-generated-schema-paths--renameFile-post-parameters-2-schema
+        updates:
+          items:
+            properties:
+              fileKey:
+                type: string
+              customId:
+                type: string
+              newName:
+                type: string
+            required:
+            - newName
+            type: object
+          type: array
+      required:
+      - updates
+      - x-uploadthing-version
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - x-uploadthing-version
+      - x-uploadthing-fe-package
+      - x-uploadthing-be-adapter
+    konfig-generated-schema-single-parameter-schema-post--deleteFile:
+      properties:
+        x-uploadthing-version:
+          description: A semver parseable version string of the SDK calling the API
+          example: 6.4.0
+          type: string
+          x-konfig-original-example: 6.4.0
+          x-konfig-generated-schema: konfig-generated-schema-paths--deleteFile-post-parameters-0-schema
+        x-uploadthing-fe-package:
+          description: "Used for analytics, the package name of the frontend"
+          example: '@uploadthing/react'
+          type: string
+          x-konfig-original-example: '@uploadthing/react'
+          x-konfig-generated-schema: konfig-generated-schema-paths--deleteFile-post-parameters-1-schema
+        x-uploadthing-be-adapter:
+          description: "Used for analytics, the name of the backend adapter"
+          example: express
+          type: string
+          x-konfig-original-example: express
+          x-konfig-generated-schema: konfig-generated-schema-paths--deleteFile-post-parameters-2-schema
+        files:
+          items:
+            type: string
+          type: array
+        fileKeys:
+          items:
+            type: string
+          type: array
+        customIds:
+          items:
+            type: string
+          type: array
+      required:
+      - x-uploadthing-version
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - x-uploadthing-version
+      - x-uploadthing-fe-package
+      - x-uploadthing-be-adapter
+    konfig-generated-schema-single-parameter-schema-post--getFileUrl:
+      properties:
+        x-uploadthing-version:
+          description: A semver parseable version string of the SDK calling the API
+          example: 6.4.0
+          type: string
+          x-konfig-original-example: 6.4.0
+          x-konfig-generated-schema: konfig-generated-schema-paths--getFileUrl-post-parameters-0-schema
+        x-uploadthing-fe-package:
+          description: "Used for analytics, the package name of the frontend"
+          example: '@uploadthing/react'
+          type: string
+          x-konfig-original-example: '@uploadthing/react'
+          x-konfig-generated-schema: konfig-generated-schema-paths--getFileUrl-post-parameters-1-schema
+        x-uploadthing-be-adapter:
+          description: "Used for analytics, the name of the backend adapter"
+          example: express
+          type: string
+          x-konfig-original-example: express
+          x-konfig-generated-schema: konfig-generated-schema-paths--getFileUrl-post-parameters-2-schema
+        files:
+          items:
+            type: string
+          type: array
+        fileKeys:
+          items:
+            type: string
+          type: array
+        customIds:
+          items:
+            type: string
+          type: array
+      required:
+      - x-uploadthing-version
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - x-uploadthing-version
+      - x-uploadthing-fe-package
+      - x-uploadthing-be-adapter
+    konfig-generated-schema-single-parameter-schema-post--getUsageInfo:
+      properties:
+        x-uploadthing-version:
+          description: A semver parseable version string of the SDK calling the API
+          example: 6.4.0
+          type: string
+          x-konfig-original-example: 6.4.0
+          x-konfig-generated-schema: konfig-generated-schema-paths--getUsageInfo-post-parameters-0-schema
+        x-uploadthing-fe-package:
+          description: "Used for analytics, the package name of the frontend"
+          example: '@uploadthing/react'
+          type: string
+          x-konfig-original-example: '@uploadthing/react'
+          x-konfig-generated-schema: konfig-generated-schema-paths--getUsageInfo-post-parameters-1-schema
+        x-uploadthing-be-adapter:
+          description: "Used for analytics, the name of the backend adapter"
+          example: express
+          type: string
+          x-konfig-original-example: express
+          x-konfig-generated-schema: konfig-generated-schema-paths--getUsageInfo-post-parameters-2-schema
+      required:
+      - x-uploadthing-version
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - x-uploadthing-version
+      - x-uploadthing-fe-package
+      - x-uploadthing-be-adapter
+    konfig-generated-schema-single-parameter-schema-post--completeMultipart:
+      properties:
+        x-uploadthing-version:
+          description: A semver parseable version string of the SDK calling the API
+          example: 6.4.0
+          type: string
+          x-konfig-original-example: 6.4.0
+          x-konfig-generated-schema: konfig-generated-schema-paths--completeMultipart-post-parameters-0-schema
+        x-uploadthing-fe-package:
+          description: "Used for analytics, the package name of the frontend"
+          example: '@uploadthing/react'
+          type: string
+          x-konfig-original-example: '@uploadthing/react'
+          x-konfig-generated-schema: konfig-generated-schema-paths--completeMultipart-post-parameters-1-schema
+        x-uploadthing-be-adapter:
+          description: "Used for analytics, the name of the backend adapter"
+          example: express
+          type: string
+          x-konfig-original-example: express
+          x-konfig-generated-schema: konfig-generated-schema-paths--completeMultipart-post-parameters-2-schema
+        fileKey:
+          type: string
+        uploadId:
+          type: string
+        etags:
+          items:
+            properties:
+              tag:
+                type: string
+              partNumber:
+                type: number
+            required:
+            - partNumber
+            - tag
+            type: object
+          type: array
+      required:
+      - etags
+      - fileKey
+      - uploadId
+      - x-uploadthing-version
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - x-uploadthing-version
+      - x-uploadthing-fe-package
+      - x-uploadthing-be-adapter
+    konfig-generated-schema-single-parameter-schema-post--failureCallback:
+      properties:
+        x-uploadthing-version:
+          description: A semver parseable version string of the SDK calling the API
+          example: 6.4.0
+          type: string
+          x-konfig-original-example: 6.4.0
+          x-konfig-generated-schema: konfig-generated-schema-paths--failureCallback-post-parameters-0-schema
+        x-uploadthing-fe-package:
+          description: "Used for analytics, the package name of the frontend"
+          example: '@uploadthing/react'
+          type: string
+          x-konfig-original-example: '@uploadthing/react'
+          x-konfig-generated-schema: konfig-generated-schema-paths--failureCallback-post-parameters-1-schema
+        x-uploadthing-be-adapter:
+          description: "Used for analytics, the name of the backend adapter"
+          example: express
+          type: string
+          x-konfig-original-example: express
+          x-konfig-generated-schema: konfig-generated-schema-paths--failureCallback-post-parameters-2-schema
+        fileKey:
+          type: string
+        uploadId:
+          description: "The uploadId, only applicable for multipart uploads."
+          nullable: true
+          type: string
+      required:
+      - fileKey
+      - x-uploadthing-version
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - x-uploadthing-version
+      - x-uploadthing-fe-package
+      - x-uploadthing-be-adapter
+    konfig-generated-schema-single-parameter-schema-post--requestFileAccess:
+      properties:
+        x-uploadthing-version:
+          description: A semver parseable version string of the SDK calling the API
+          example: 6.4.0
+          type: string
+          x-konfig-original-example: 6.4.0
+          x-konfig-generated-schema: konfig-generated-schema-paths--requestFileAccess-post-parameters-0-schema
+        x-uploadthing-fe-package:
+          description: "Used for analytics, the package name of the frontend"
+          example: '@uploadthing/react'
+          type: string
+          x-konfig-original-example: '@uploadthing/react'
+          x-konfig-generated-schema: konfig-generated-schema-paths--requestFileAccess-post-parameters-1-schema
+        x-uploadthing-be-adapter:
+          description: "Used for analytics, the name of the backend adapter"
+          example: express
+          type: string
+          x-konfig-original-example: express
+          x-konfig-generated-schema: konfig-generated-schema-paths--requestFileAccess-post-parameters-2-schema
+        fileKey:
+          type: string
+        customId:
+          type: string
+        expiresIn:
+          exclusiveMinimum: true
+          maximum: 604800
+          minimum: 0
+          type: number
+      required:
+      - x-uploadthing-version
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - x-uploadthing-version
+      - x-uploadthing-fe-package
+      - x-uploadthing-be-adapter
+    konfig-generated-schema-single-parameter-schema-post--prepareUpload:
+      properties:
+        x-uploadthing-version:
+          description: A semver parseable version string of the SDK calling the API
+          example: 6.4.0
+          type: string
+          x-konfig-original-example: 6.4.0
+          x-konfig-generated-schema: konfig-generated-schema-paths--prepareUpload-post-parameters-0-schema
+        x-uploadthing-fe-package:
+          description: "Used for analytics, the package name of the frontend"
+          example: '@uploadthing/react'
+          type: string
+          x-konfig-original-example: '@uploadthing/react'
+          x-konfig-generated-schema: konfig-generated-schema-paths--prepareUpload-post-parameters-1-schema
+        x-uploadthing-be-adapter:
+          description: "Used for analytics, the name of the backend adapter"
+          example: express
+          type: string
+          x-konfig-original-example: express
+          x-konfig-generated-schema: konfig-generated-schema-paths--prepareUpload-post-parameters-2-schema
+        callbackUrl:
+          format: uri
+          type: string
+        callbackSlug:
+          type: string
+        files:
+          items:
+            properties:
+              name:
+                type: string
+              size:
+                minimum: 0
+                type: number
+              customId:
+                nullable: true
+                type: string
+            required:
+            - name
+            - size
+            type: object
+          type: array
+        routeConfig:
+          $ref: '#/components/schemas/RouteConfig'
+        metadata:
+          nullable: true
+      required:
+      - callbackSlug
+      - callbackUrl
+      - files
+      - routeConfig
+      - x-uploadthing-version
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - x-uploadthing-version
+      - x-uploadthing-fe-package
+      - x-uploadthing-be-adapter
+    konfig-generated-schema-single-parameter-schema-post--uploadFiles:
+      properties:
+        x-uploadthing-version:
+          description: A semver parseable version string of the SDK calling the API
+          example: 6.4.0
+          type: string
+          x-konfig-original-example: 6.4.0
+          x-konfig-generated-schema: konfig-generated-schema-paths--uploadFiles-post-parameters-0-schema
+        x-uploadthing-fe-package:
+          description: "Used for analytics, the package name of the frontend"
+          example: '@uploadthing/react'
+          type: string
+          x-konfig-original-example: '@uploadthing/react'
+          x-konfig-generated-schema: konfig-generated-schema-paths--uploadFiles-post-parameters-1-schema
+        x-uploadthing-be-adapter:
+          description: "Used for analytics, the name of the backend adapter"
+          example: express
+          type: string
+          x-konfig-original-example: express
+          x-konfig-generated-schema: konfig-generated-schema-paths--uploadFiles-post-parameters-2-schema
+        files:
+          items:
+            properties:
+              name:
+                type: string
+              size:
+                exclusiveMinimum: true
+                minimum: 0
+                type: number
+              type:
+                type: string
+              customId:
+                type: string
+            required:
+            - name
+            - size
+            - type
+            type: object
+          type: array
+        acl:
+          enum:
+          - public-read
+          - private
+          type: string
+        metadata:
+          nullable: true
+        contentDisposition:
+          default: inline
+          enum:
+          - inline
+          - attachment
+          example: inline
+          type: string
+          x-konfig-original-example: inline
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-FileRequestPresignedUrlsRequest-properties-contentDisposition
+      required:
+      - contentDisposition
+      - files
+      - x-uploadthing-version
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - x-uploadthing-version
+      - x-uploadthing-fe-package
+      - x-uploadthing-be-adapter
+    PMUURLs:
+      properties:
+        key:
+          type: string
+        fileName:
+          type: string
+        fileType:
+          type: string
+        fileUrl:
+          type: string
+        ContentDisposition:
+          enum:
+          - inline
+          - attachment
+          type: string
+        pollingJwt:
+          type: string
+        pollingUrl:
+          type: string
+        customId:
+          nullable: true
+          type: string
+        url:
+          type: string
+        fields:
+          additionalProperties:
+            type: string
+          type: object
+        urls:
+          items:
+            type: string
+          type: array
+        uploadId:
+          type: string
+        chunkSize:
+          type: number
+        chunkCount:
+          type: number
+      required:
+      - ContentDisposition
+      - customId
+      - fileName
+      - fileType
+      - fileUrl
+      - key
+      - pollingJwt
+      - pollingUrl
+      type: object
+    PMUURLs1:
+      properties:
+        key:
+          type: string
+        fileName:
+          type: string
+        fileType:
+          type: string
+        fileUrl:
+          type: string
+        ContentDisposition:
+          enum:
+          - inline
+          - attachment
+          type: string
+        pollingJwt:
+          type: string
+        pollingUrl:
+          type: string
+        customId:
+          nullable: true
+          type: string
+        url:
+          type: string
+        fields:
+          additionalProperties:
+            type: string
+          type: object
+        urls:
+          items:
+            type: string
+          type: array
+        uploadId:
+          type: string
+        chunkSize:
+          type: number
+        chunkCount:
+          type: number
+      required:
+      - ContentDisposition
+      - customId
+      - fileName
+      - fileType
+      - fileUrl
+      - key
+      - pollingJwt
+      - pollingUrl
+      type: object
+    FileRenameFilesRequest_updates_inner:
+      example:
+        newName: newName
+        fileKey: fileKey
+        customId: customId
+      properties:
+        fileKey:
+          type: string
+        customId:
+          type: string
+        newName:
+          type: string
+      required:
+      - newName
+      type: object
+    MultipartCompleteUploadRequest_etags_inner:
+      example:
+        partNumber: 0.8008281904610115
+        tag: tag
+      properties:
+        tag:
+          type: string
+        partNumber:
+          type: number
+      required:
+      - partNumber
+      - tag
+      type: object
+    UploadRequestPresignedUrlsRequest_files_inner:
+      example:
+        size: 0.08008281904610115
+        name: name
+        customId: customId
+      properties:
+        name:
+          type: string
+        size:
+          minimum: 0
+          type: number
+        customId:
+          nullable: true
+          type: string
+      required:
+      - name
+      - size
+      type: object
+    FileRequestPresignedUrlsRequest_files_inner:
+      example:
+        size: 0.08008281904610115
+        name: name
+        type: type
+        customId: customId
+      properties:
+        name:
+          type: string
+        size:
+          exclusiveMinimum: true
+          minimum: 0
+          type: number
+        type:
+          type: string
+        customId:
+          type: string
+      required:
+      - name
+      - size
+      - type
+      type: object
+    FileListFilesResponse_files_inner:
+      example:
+        name: name
+        id: id
+        customId: customId
+        key: key
+        status: status
+      properties:
+        id:
+          type: string
+        customId:
+          nullable: true
+          type: string
+        key:
+          type: string
+        name:
+          type: string
+        status:
+          type: string
+      required:
+      - customId
+      - id
+      - key
+      - name
+      - status
+      type: object
+    FileGetFileUrlsResponse_data_inner:
+      example:
+        url: url
+        key: key
+      properties:
+        url:
+          type: string
+        key:
+          type: string
+      required:
+      - key
+      - url
+      type: object
+  securitySchemes:
+    ApiKeyAuth:
+      in: header
+      name: x-uploadthing-api-key
+      type: apiKey
+      x-konfig-globally-required-security: true
+
